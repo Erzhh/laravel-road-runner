@@ -1,5 +1,6 @@
 stages:
-  - first
+  - dev_start
+  - dev_deploy
 
 variables:
   REGISTRY: "registry.gitlab.com/erzh/laravel_cicd"
@@ -7,7 +8,7 @@ variables:
 before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
-first_run:
+dev_start:
   stage: first
   tags:
     - test
@@ -18,3 +19,20 @@ first_run:
     - docker push "$REGISTRY/dev/app:$CI_COMMIT_SHA"
 
 
+dev_deploy:
+  stage: deploy
+  tags:
+    - prod
+  only:
+    - master
+  script:
+    - export CONTAINER_PREFIX=laravel-roadrunner-in-docker
+    - docker stop $(docker ps -a | grep ${CONTAINER_PREFIX}_ | awk '{print $1}')_1 || true
+    - docker rm $(docker ps -a | grep ${CONTAINER_PREFIX}_ | awk '{print $1}')_1 || true
+    - docker volume rm $(docker volume ls | grep ${CONTAINER_PREFIX}_ | awk '{print $2}')_1 || true
+    - docker-compose -p $CONTAINER_PREFIX -f docker-compose.yml up -d
+    - docker exec ${CONTAINER_PREFIX}_web_1 composer update
+    - docker exec ${CONTAINER_PREFIX}_web_1 composer install
+    - docker exec ${CONTAINER_PREFIX}_web_1 php artisan migrate
+    - docker exec ${CONTAINER_PREFIX}_web_1 php artisan cache:clear
+    - docker exec ${CONTAINER_PREFIX}_web_1 php artisan config:cache
