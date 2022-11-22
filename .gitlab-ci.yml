@@ -1,6 +1,5 @@
 stages:
   - first
-  - second
 
 first_run:
   stage: first
