@@ -31,16 +31,16 @@ services:
       - .:/app:rw
     depends_on:
       postgres: {condition: service_healthy}
-      redis: {condition: service_healthy}
+      redis:    {condition: service_healthy}
 
   web:
     <<: *app
     command: rr serve -c .rr.local.yaml
     ports:
-      - '8080:8080/tcp'
+      - '8043:8080/tcp'
       - '8443:8443/tcp'
     healthcheck:
-      test: ['CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8082/health?plugin=http&plugin=rpc"']
+      test: ['CMD-SHELL', 'wget --spider -q "http://127.0.0.1:8043/health?plugin=http&plugin=rpc"']
       interval: 2s
       timeout: 2s
 
@@ -61,7 +61,7 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data:rw
     ports:
-      - '5432/tcp'
+      - '5443/tcp'
     healthcheck: # Healthcheck docs: <https://docs.docker.com/engine/reference/builder/#healthcheck>
       test: ['CMD-SHELL', 'pg_isready -U forge']
       interval: 2s
@@ -74,7 +74,7 @@ services:
     volumes:
       - redis-data:/data:rw
     ports:
-      - '6379/tcp'
+      - '6343/tcp'
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
       interval: 500ms
