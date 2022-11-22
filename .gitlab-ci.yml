@@ -1,0 +1,10 @@
+stages:
+  - first
+  - second
+
+first_run:
+  stage: first
+  tags:
+    - test
+  script:
+    - echo "Hello first pipeline !"
