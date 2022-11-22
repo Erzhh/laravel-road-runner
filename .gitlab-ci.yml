@@ -5,5 +5,7 @@ first_run:
   stage: first
   tags:
     - test
+  only:
+    - master
   script:
     - echo "Hello second pipeline"
