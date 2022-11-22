@@ -1,6 +1,12 @@
 stages:
   - first
 
+variables:
+  REGISTRY: "registry.gitlab.com/erzh/laravel_cicd"
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
 first_run:
   stage: first
   tags:
@@ -8,5 +14,7 @@ first_run:
   only:
     - master
   script:
-    - echo "Hello second pipeline"
+    - docker build --build-arg NODE_ENV="dev" -t "$REGISTRY/dev/app:$CI_COMMIT_SHA" -f ./Dockerfile .
+    - docker push "$REGISTRY/dev/app:$CI_COMMIT_SHA"
+
 
