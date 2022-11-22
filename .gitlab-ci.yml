@@ -7,4 +7,4 @@ first_run:
   tags:
     - test
   script:
-    - echo "Hello first pipeline !"
+    - echo "Hello second pipeline !"
