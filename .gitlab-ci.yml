@@ -1,6 +1,6 @@
 stages:
-  - dev_start
-  - dev_deploy
+  - testing
+  - deploy
 
 variables:
   REGISTRY: "registry.gitlab.com/erzh/laravel_cicd"
@@ -9,7 +9,7 @@ before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 dev_start:
-  stage: first
+  stage: testing
   tags:
     - test
   only:
