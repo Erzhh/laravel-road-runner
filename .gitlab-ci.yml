@@ -36,3 +36,4 @@ dev_deploy:
     - docker exec ${CONTAINER_PREFIX}_web_1 php artisan migrate
     - docker exec ${CONTAINER_PREFIX}_web_1 php artisan cache:clear
     - docker exec ${CONTAINER_PREFIX}_web_1 php artisan config:cache
+
