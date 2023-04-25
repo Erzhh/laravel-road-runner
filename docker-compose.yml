@@ -8,37 +8,11 @@ volumes:
   tmp-data: {}
 
 services:
-#  app: &app
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    user: "${APP_UID:-10001}:${APP_GID:-10001}"
-#    restart: always
-#    environment:
-#      PS1: '\[\033[1;32m\]\[\033[1;36m\][\u@\h] \[\033[1;34m\]\w\[\033[0;35m\] \[\033[1;36m\]# \[\033[0m\]'
-#      HOME: /tmp
-#      APP_DEBUG: 'true'
-#      APP_ENV: local
-#      REDIS_HOST: redis
-#      REDIS_PASSWORD: redis_password
-#      DB_HOST: postgres
-#      DB_DATABASE: forge
-#      DB_USERNAME: forge
-#      DB_PASSWORD: forge
-#    volumes:
-#      - /etc/passwd:/etc/passwd:ro
-#      - /etc/group:/etc/group:ro
-#      - tmp-data:/tmp:rw
-#      - .:/app:rw
-#    depends_on:
-#      postgres: {condition: service_healthy}
-#      redis:    {condition: service_healthy}
-
-  web: &app
+  app: &app
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always
+    user: "${APP_UID:-10001}:${APP_GID:-10001}"
     environment:
       PS1: '\[\033[1;32m\]\[\033[1;36m\][\u@\h] \[\033[1;34m\]\w\[\033[0;35m\] \[\033[1;36m\]# \[\033[0m\]'
       HOME: /tmp
@@ -50,6 +24,17 @@ services:
       DB_DATABASE: forge
       DB_USERNAME: forge
       DB_PASSWORD: forge
+    volumes:
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      - tmp-data:/tmp:rw
+      - .:/app:rw
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis:    {condition: service_healthy}
+
+  web:
+    <<: *app
     command: rr serve -c .rr.local.yaml
     ports:
       - '8043:8080/tcp'
@@ -59,13 +44,13 @@ services:
       interval: 2s
       timeout: 2s
 
-#  queue:
-#    <<: *app
-#    command: php /app/artisan queue:work --memory=256 --sleep=1
-#
-#  cron:
-#    <<: *app
-#    command: supercronic /etc/supercronic/laravel # it runs artisan schedule:run
+  queue:
+    <<: *app
+    command: php /app/artisan queue:work --memory=256 --sleep=1
+
+  cron:
+    <<: *app
+    command: supercronic /etc/supercronic/laravel # it runs artisan schedule:run
 
   postgres:
     image: postgres:14-alpine # Image page: <https://hub.docker.com/_/postgres>
